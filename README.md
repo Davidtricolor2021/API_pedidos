@@ -1,68 +1,364 @@
-# CodeIgniter 4 Application Starter
+# Projeto API RESTful - Clientes, Produtos e Pedidos
 
-## What is CodeIgniter?
+Este projeto é uma API RESTful desenvolvida com o framework **CodeIgniter 4** para gerenciar clientes, produtos e pedidos. Ele permite a criação, leitura, atualização e exclusão (CRUD) de registros nesses três recursos.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Requisitos
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+- PHP 7.4 ou superior
+- Composer
+- CodeIgniter 4
+- Banco de Dados MySQL (ou outro de sua preferência)
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## Como baixar o projeto
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
 
-## Installation & updates
+### 1. Clone o repositório para sua máquina local:
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+```bash
+git clone https://github.com/Davidtricolor2021/API_pedidos.git
+cd API_pedidos
+```
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+### 2. Instale as dependências com o Composer:
 
-## Setup
+```bash
+composer install
+```
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+### 3. Configuração do .env
+Copie o arquivo env para .env:
 
-## Important Change with index.php
+```bash
+cp .env.example .env
+```
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Abra o arquivo .env e configure as variáveis de ambiente, como baseURL e as configurações do banco de dados:
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
 
-**Please** read the user guide for a better explanation of how CI4 works!
+```bash
+CI_ENVIRONMENT = development
+app.baseURL = http://localhost:8080
 
-## Repository Management
+database.default.hostname = localhost
+database.default.database = nome_do_banco
+database.default.username = usuario_do_banco
+database.default.password = senha_do_banco
+database.default.DBDriver = MySQLi
+database.default.DBPrefix = 
+database.default.port = 3306
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+### 4. Criar o Banco de Dados
+Utilize o comando abaixo para criar o banco de dados automaticamente:
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+```bash
+php spark db:create
+```
 
-## Server Requirements
+### 5. Rodar as Migrations
+Depois de criar o banco de dados, rode as migrations para criar as tabelas necessárias:
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+```bash
+php spark migrate
+```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+### 6. Rodar o Servidor de Desenvolvimento
+Para rodar a API localmente, execute o seguinte comando:
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+```bash
+php spark serve
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Isso vai iniciar o servidor em http://localhost:8080.
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## Endpoints da API
+A seguir estão os detalhes de cada endpoint, com exemplos de requisições e respostas.
+
+### 1. Endpoints de Clientes
+
+Criar Cliente
+
+- Método: POST
+- URL: /clientes
+- Body (JSON):
+
+```json
+{
+  "parametros": {
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Empresa Exemplo"
+  }
+}
+```
+
+- Resposta de Sucesso (201):
+
+```json
+{
+  "cabecalho": {
+    "status": 201,
+    "mensagem": "Cliente criado com sucesso."
+  },
+  "retorno": {
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Empresa Exemplo"
+  }
+}
+```
+
+- Resposta de Erro (422):
+```json
+{
+  "cabecalho": {
+    "status": 422,
+    "mensagem": "Erro de validação."
+  },
+  "retorno": {
+    "cpf_cnpj": ["O campo cpf_cnpj é obrigatório."],
+    "nome_razao_social": ["O campo nome_razao_social é obrigatório."]
+  }
+}
+```
+
+Listar Todos os Clientes
+
+- Método: GET
+- URL: /clientes
+- Resposta de Sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Clientes encontrados."
+  },
+  "retorno": [
+    {
+      "cpf_cnpj": "12345678901234",
+      "nome_razao_social": "Empresa Exemplo"
+    }
+  ]
+}
+```
+
+Mostrar Cliente Específico
+
+- Método: GET
+- URL: /clientes/{id}
+- Resposta de Sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Cliente encontrado."
+  },
+  "retorno": {
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Empresa Exemplo"
+  }
+}
+```
+
+Atualizar Cliente
+
+- Método: PUT
+- URL: /clientes/{id}
+- Body (JSON):
+
+```json
+{
+  "parametros": {
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Nova Empresa"
+  }
+}
+```
+
+- Resposta de Sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Cliente atualizado com sucesso."
+  },
+  "retorno": {
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Nova Empresa"
+  }
+}
+```
+
+Deletar Cliente
+
+- Método: DELETE
+- URL: /clientes/{id}
+- Resposta de Sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Cliente deletado com sucesso."
+  },
+  "retorno": {
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Nova Empresa"
+  }
+}
+```
+### 2. Endpoints de Produtos
+
+Criar Produto
+
+- Método: POST
+- URL: /produtos
+- Body (JSON):
+
+```json
+{
+  "parametros": {
+    "descricao": "Produto Exemplo",
+    "preco": 100.0
+  }
+}
+```
+
+ - Resposta de sucesso (201):
+
+```json
+{
+  "cabecalho": {
+    "status": 201,
+    "mensagem": "Produto criado com sucesso."
+  },
+  "retorno": {
+    "descricao": "Produto Exemplo",
+    "preco": 100.0
+  }
+}
+```
+
+Listar todos os Produtos
+
+- Método: GET
+- URL: /produtos
+
+- Resposta de sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Produtos encontrados."
+  },
+  "retorno": [
+    {
+      "id": 1,
+      "descricao": "Produto Exemplo",
+      "preco": 100.0
+    }
+  ]
+}
+```
+
+Mostrar um Produto
+
+- Método: GET
+- URL: /produtos/{id}
+
+- Resposta de sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Produto encontrado."
+  },
+  "retorno": {
+    "id": 1,
+    "descricao": "Produto Exemplo",
+    "preco": 100.0
+  }
+}
+```
+
+Atualizar Produto
+
+- Método: PUT
+- URL: /produtos/{id}
+- Body (JSON):
+
+```json
+{
+  "parametros": {
+    "descricao": "Produto Atualizado",
+    "preco": 120.0
+  }
+}
+```
+
+- Resposta de sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Produto atualizado com sucesso."
+  },
+  "retorno": {
+    "descricao": "Produto Atualizado",
+    "preco": 120.0
+  }
+}
+```
+
+Deletar Produto
+
+- Método: DELETE
+- URL: /produtos/{id}
+- Resposta de sucesso (200):
+
+```json
+{
+  "cabecalho": {
+    "status": 200,
+    "mensagem": "Produto deletado com sucesso."
+  },
+  "retorno": {
+    "id": 1,
+    "descricao": "Produto Atualizado",
+    "preco": 120.0
+  }
+}
+```
+
+### 3. Endpoints de Pedidos
+
+Criar Pedido
+
+- Método: POST
+- URL: /pedidos
+- Body (JSON):
+
+Listar todos os Pedidos
+
+- Método: GET
+- URL: /pedidos
+
+Mostrar Pedido Específico
+
+- Método: GET
+- URL: /pedidos/{id}
+
+Atualizar Pedido
+
+- Método: PUT
+- URL: /pedidos/{id}
+- Body (JSON):
+
+Deletar Pedido
+
+- Método: DELETE
+- URL: /pedidos/{id}
