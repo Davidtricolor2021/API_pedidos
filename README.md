@@ -26,11 +26,8 @@ composer install
 ```
 
 ### 3. Configuração do .env
-Copie o arquivo env para .env:
 
-```bash
-cp .env.example .env
-```
+Copie o arquivo env para .env:
 
 Abra o arquivo .env e configure as variáveis de ambiente, como baseURL e as configurações do banco de dados:
 
@@ -244,7 +241,6 @@ Listar todos os Produtos
 
 - Método: GET
 - URL: /produtos
-
 - Resposta de sucesso (200):
 
 ```json
@@ -267,7 +263,6 @@ Mostrar um Produto
 
 - Método: GET
 - URL: /produtos/{id}
-
 - Resposta de sucesso (200):
 
 ```json
@@ -342,23 +337,166 @@ Criar Pedido
 - URL: /pedidos
 - Body (JSON):
 
+```json
+    {
+      "parametros": {
+        "cliente_id": <ID do cliente>,
+        "produtos": [
+          {
+            "produto_id": <ID do produto>,
+            "quantidade": <quantidade>
+          }
+        ]
+      }
+    }
+```
+
+- Resposta de sucesso (201):
+
+```json
+    {
+      "cabecalho": {
+        "status": 201,
+        "mensagem": "Pedido criado com sucesso."
+      },
+      "retorno": {
+        "pedido": <detalhes do pedido>,
+        "produtos": <produtos inseridos no pedido>
+      }
+    }
+```
+
 Listar todos os Pedidos
 
 - Método: GET
 - URL: /pedidos
+- Resposta de sucesso (200):
+
+```json
+    {
+      "cabecalho": {
+        "status": 200,
+        "mensagem": "Pedidos listados com sucesso."
+      },
+      "retorno": [
+        {
+          "id": <ID do pedido>,
+          "cliente_id": <ID do cliente>,
+          "status": <status do pedido>,
+          "produtos": [
+            {
+              "descricao": <descrição do produto>,
+              "quantidade": <quantidade>,
+              "preco": <preço>
+            }
+          ]
+        }
+      ]
+    }
+```
 
 Mostrar Pedido Específico
 
 - Método: GET
 - URL: /pedidos/{id}
+- Resposta de sucesso (200):
 
-Atualizar Pedido
+```json
+    {
+      "cabecalho": {
+        "status": 200,
+        "mensagem": "Pedido encontrado."
+      },
+      "retorno": {
+        "id": <ID do pedido>,
+        "cliente_id": <ID do cliente>,
+        "status": <status do pedido>,
+        "produtos": [
+          {
+            "descricao": <descrição do produto>,
+            "quantidade": <quantidade>,
+            "preco": <preço>
+          }
+        ]
+      }
+    }
+```
+
+Atualizar Pedido (Aqui podemos passar os parametros para a requisição de 3 formas diferentes)
 
 - Método: PUT
 - URL: /pedidos/{id}
 - Body (JSON):
 
+Atualizar somente status do Pedido
+
+```json
+{
+    "parametros": {
+        "status": <status>
+    }
+}
+```
+
+Atualizar quantidade e preco
+
+```json
+{
+    "parametros": {
+        "produtos": [
+            {
+                "produto_id": <ID do produto>,
+                "quantidade": <quantidade>,
+                "preco": <preco>
+            }
+        ]
+    }
+}
+```
+
+Deletar produto do pedido
+
+```json
+{
+    "parametros": {
+        "produtos_excluir": [
+            {
+                "produto_id": <ID do produto>
+            }
+        ]
+    }
+}
+```
+
+- Resposta de sucesso (200):
+
+```json
+    {
+      "cabecalho": {
+        "status": 200,
+        "mensagem": "Pedido atualizado com sucesso."
+      },
+      "retorno": {
+        "pedido": <detalhes do pedido atualizado>,
+        "produtos": <produtos atualizados>
+      }
+    }
+```
+
 Deletar Pedido
 
 - Método: DELETE
 - URL: /pedidos/{id}
+- Resposta de sucesso (200):
+
+```json
+    {
+      "cabecalho": {
+        "status": 200,
+        "mensagem": "Pedido deletado com sucesso."
+      },
+      "retorno": {
+        "pedido_id": <ID do pedido deletado>
+      }
+    }
+```
